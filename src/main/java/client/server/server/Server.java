@@ -1,4 +1,6 @@
-package ClientServer;
+package client.server.server;
+
+import client.server.input.handlers.SocketReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +15,12 @@ public class Server extends Thread {
     Socket clientSocket;
     SocketReader socketReader;
     Thread readerThread;
-    int sleepTime = 500;
+    int sleepTime = 1000;
     int loopsSinceLastPing = 0;
-
+    String pingPacket = "\0";
     int loopLimit = 5;
     InputStream clientIs;
     OutputStream clientOs;
-
-    String message = "\0";
 
     public Server() {
     }
@@ -48,7 +48,7 @@ public class Server extends Thread {
         readerThread = new Thread(socketReader);
         readerThread.start();
         while (loopsSinceLastPing <  loopLimit){
-            clientOs.write(message.getBytes(StandardCharsets.UTF_8));
+            clientOs.write(pingPacket.getBytes(StandardCharsets.UTF_8));
             Thread.sleep(sleepTime);
         }
         loopsSinceLastPing = 0;

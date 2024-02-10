@@ -1,5 +1,7 @@
-package ClientServer;
+package client.server.server;
 
+
+import client.server.server.Server;
 
 import java.io.IOException;
 

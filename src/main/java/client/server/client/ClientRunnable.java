@@ -1,4 +1,4 @@
-package ClientServer;
+package client.server.client;
 
 public class ClientRunnable {
     public static void main(String[] args) {

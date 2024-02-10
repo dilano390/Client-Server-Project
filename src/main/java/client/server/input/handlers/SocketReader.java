@@ -1,4 +1,4 @@
-package ClientServer;
+package client.server.input.handlers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +9,7 @@ public class SocketReader implements Runnable{
 
     int loopsSinceLastPing = 0;
 
-    int loopLimit = 5;
+    int loopLimit = 500;
 
     int sleepTime = 500;
     InputStream is;
@@ -23,11 +23,11 @@ public class SocketReader implements Runnable{
             if (is.available() > 0) {
                 byte[] readBytes = is.readNBytes(is.available());
                 String message = new String(readBytes, StandardCharsets.UTF_8);
-                if(!message.equals("\0")) System.out.println("Received: \"" + message + "\"");
-
+                if(!message.equals("\0")){
+                    System.out.println("Received: \"" + message + "\"");
+                }
                 loopsSinceLastPing = 0;
             } else {
-                System.out.println("Did not receive");
                 loopsSinceLastPing += 1;
             }
             Thread.sleep(sleepTime);
