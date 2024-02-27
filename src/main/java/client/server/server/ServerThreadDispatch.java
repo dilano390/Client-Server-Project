@@ -9,20 +9,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class Server extends Thread {
+public class ServerThreadDispatch extends Thread {
     public ServerSocket serverSocket;
 
+    Thread serverThread;
     Socket clientSocket;
-    SocketReader socketReader;
-    Thread readerThread;
-    int sleepTime = 1000;
-    int loopsSinceLastPing = 0;
-    String pingPacket = "\0";
-    int loopLimit = 5;
-    InputStream clientIs;
-    OutputStream clientOs;
-
-    public Server() {
+    public ServerThreadDispatch() {
     }
 
 
@@ -38,22 +30,11 @@ public class Server extends Thread {
     public void waitForSocket() throws IOException {
         System.out.println("Server waiting for connection");
         clientSocket = serverSocket.accept();
-        clientIs = clientSocket.getInputStream();
-        clientOs = clientSocket.getOutputStream();
-        socketReader = new SocketReader(clientIs);
         System.out.println("Connected to " + clientSocket.getLocalSocketAddress());
+        serverThread = new Thread(new ServerThread(clientSocket));
+        serverThread.start();
     }
 
-    public void listenToSocket() throws IOException, InterruptedException {
-        readerThread = new Thread(socketReader);
-        readerThread.start();
-        while (loopsSinceLastPing <  loopLimit){
-            clientOs.write(pingPacket.getBytes(StandardCharsets.UTF_8));
-            Thread.sleep(sleepTime);
-        }
-        loopsSinceLastPing = 0;
-        System.out.println("Connection timed out");
-    }
 
 
     @Override
@@ -62,12 +43,11 @@ public class Server extends Thread {
             initializeServer();
             while (!serverSocket.isClosed()) {
                 waitForSocket();
-                listenToSocket();
             }
 
             closeServer();
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 

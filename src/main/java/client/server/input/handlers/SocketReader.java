@@ -30,6 +30,7 @@ public class SocketReader implements Runnable{
             } else {
                 loopsSinceLastPing += 1;
             }
+
             Thread.sleep(sleepTime);
         }
     }
