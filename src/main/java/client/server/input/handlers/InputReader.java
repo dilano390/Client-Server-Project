@@ -1,13 +1,15 @@
 package client.server.input.handlers;
 
-import java.util.Objects;
+import client.server.MessageSender;
+
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
 
 public class InputReader implements Runnable {
-    BlockingQueue<String> inputQueue;
-    public InputReader(BlockingQueue<String> inputQueue){
-        this.inputQueue = inputQueue;
+
+    MessageSender socketInteractable;
+
+    public InputReader(MessageSender socketInteractable){
+        this.socketInteractable = socketInteractable;
     }
 
     Scanner inputScanner = new Scanner(System.in);
@@ -19,19 +21,16 @@ public class InputReader implements Runnable {
         String userInput;
         Boolean reading = true;
             while(reading){
-                System.out.print("Enter your message: ");
+                System.out.print(socketInteractable.getNextMessageToSend());
                 userInput = inputScanner.nextLine();
                 try {
-                    if(!userInput.isEmpty()) inputQueue.put(userInput);
-                    userInput = "";
+                    if(!userInput.isEmpty()) socketInteractable.sendMessage(userInput);
+//                    userInput = "";
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                if(Objects.equals(userInput, "quit")){
-                    System.out.println("Quit command received");
-                    reading = false;
-                }
+              reading = socketInteractable.isConnectionActive();
             }
     }
 }
